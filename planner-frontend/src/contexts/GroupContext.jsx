@@ -29,7 +29,7 @@ const removeMember = async (groupId, userId) => {
     const numericUserId = parseInt(userId, 10);
     const numericGroupId = parseInt(groupId, 10);
     
-    const response = await fetch(`https://planner-application-oym5.onrender.com/api/groups/${numericGroupId}/members/${numericUserId}`, {
+    const response = await fetch(`https://planner-application-2kgd.onrender.com/api/groups/${numericGroupId}/members/${numericUserId}`, {
       method: 'DELETE',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -56,7 +56,7 @@ const removeMember = async (groupId, userId) => {
 const createGroup = async (groupData) => {
   try {
     const token = localStorage.getItem('token');
-    const response = await fetch('https://planner-application-oym5.onrender.com/api/groups', {
+    const response = await fetch('https://planner-application-2kgd.onrender.com/api/groups', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,

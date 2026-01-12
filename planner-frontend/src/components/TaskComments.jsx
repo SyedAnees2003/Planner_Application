@@ -13,7 +13,7 @@ const TaskComments = ({ taskId, taskType, isOpen, onClose }) => {
     if (window.location.hostname === 'localhost') {
       return 'http://localhost:5000'; // Your backend port
     }
-    return ''; // Same origin in production
+    return 'https://planner-application-2kgd.onrender.com'; // Same origin in production
   };
 
   const fetchComments = async () => {

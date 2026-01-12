@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://planner-application-oym5.onrender.com"
+  baseURL: "https://planner-application-2kgd.onrender.com"
 });
 
 api.interceptors.request.use((config) => {
