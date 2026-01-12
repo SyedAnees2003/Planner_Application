@@ -19,7 +19,7 @@ const IndividualTaskCard = ({ task, readOnly = false }) => {
   // Comments state
   const [showComments, setShowComments] = useState(false);
 
-  const currentUserId = localStorage.getItem('userId') || '';
+  const currentUserId = Number(localStorage.getItem('userId'));
   const isCreator = task.createdBy === currentUserId;
   const isAssignedToMe = task.assignedUserId === currentUserId;
   const canEdit = isCreator;
@@ -35,14 +35,16 @@ const IndividualTaskCard = ({ task, readOnly = false }) => {
     setIsEditing(false);
   };
 
-  const handleStatusUpdate = async (newStatus) => {
-    try {
-      await updateIndividualTaskStatus(task.id, newStatus);
-      await loadMyTasks();
-    } catch (error) {
-      console.error("Failed to update task status:", error);
-    }
-  };
+const handleStatusUpdate = async (newStatus) => {
+  if (newStatus === task.status) return;
+
+  try {
+    await updateIndividualTaskStatus(task.id, newStatus);
+  } catch (error) {
+    console.error("Failed to update task status:", error);
+  }
+};
+
 
   const getAvailableStatuses = () => {
     const allStatuses = ["PENDING", "IN_PROGRESS", "COMPLETED"];
