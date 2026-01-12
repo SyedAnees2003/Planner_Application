@@ -173,7 +173,7 @@ const Login = () => {
                   type="password"
                   className="w-full border border-slate-300 rounded-xl pl-12 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition duration-200 bg-slate-50 hover:bg-white"
                   placeholder="••••••••"
-                  value={pisForgotMode ? newPassword : password}
+                  value={isForgotMode ? newPassword : password}
                   onChange={(e) => isForgotMode
                     ? setNewPassword(e.target.value)
                     : setPassword(e.target.value)}
