@@ -46,6 +46,13 @@ export const AuthProvider = ({ children }) => {
     setIsAuthenticated(false);
   };
 
+  const forgotPassword = async (email, newPassword) => {
+    await api.post("/auth/forgot-password", {
+      email,
+      newPassword
+    });
+  };
+  
   return (
     <AuthContext.Provider
       value={{
@@ -54,7 +61,8 @@ export const AuthProvider = ({ children }) => {
         loading,
         login,
         register,
-        logout
+        logout,
+        forgotPassword
       }}
     >
       {children}

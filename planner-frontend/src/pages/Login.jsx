@@ -4,7 +4,7 @@ import { useAuth } from "../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 
 const Login = () => {
-  const { login } = useAuth();
+  const { login, forgotPassword } = useAuth();
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
@@ -12,20 +12,38 @@ const Login = () => {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  const [isForgotMode, setIsForgotMode] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+  const [success, setSuccess] = useState("");
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setSuccess("");
     setIsLoading(true);
   
     try {
-      await login(email, password);
-      navigate("/");
+      if (isForgotMode) {
+        await forgotPassword(email, newPassword);
+        setSuccess("Password updated successfully. Please login.");
+        setIsForgotMode(false);
+        setPassword("");
+        setNewPassword("");
+      } else {
+        await login(email, password);
+        navigate("/");
+      }
     } catch (err) {
-      setError("Invalid email or password");
+      setError(
+        isForgotMode
+          ? "Failed to reset password"
+          : "Invalid email or password"
+      );
     } finally {
       setIsLoading(false);
     }
-  };  
+  };
+  
 
   return (
     <div className="min-h-screen flex">
@@ -96,11 +114,12 @@ const Login = () => {
           
           <div className="text-center mb-8">
             <h2 className="text-3xl font-bold text-slate-900 mb-2">
-              Welcome back
+            {isForgotMode ? "Reset Password" : "Welcome back"}
             </h2>
             <p className="text-slate-600">
-              Sign in to continue to your dashboard
-            </p>
+            {isForgotMode
+                ? "Enter your email and new password"
+                : "Sign in to continue to your dashboard"}            </p>
           </div>
 
           {error && (
@@ -109,6 +128,11 @@ const Login = () => {
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd"/>
               </svg>
               <span className="text-sm">{error}</span>
+            </div>
+          )}
+          {success && (
+            <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl mb-6 text-sm">
+              {success}
             </div>
           )}
 
@@ -137,7 +161,7 @@ const Login = () => {
 
             <div>
               <label className="block text-sm font-semibold text-slate-700 mb-2">
-                Password
+              {isForgotMode ? "New Password" : "Password"}
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -149,8 +173,10 @@ const Login = () => {
                   type="password"
                   className="w-full border border-slate-300 rounded-xl pl-12 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition duration-200 bg-slate-50 hover:bg-white"
                   placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  value={pisForgotMode ? newPassword : password}
+                  onChange={(e) => isForgotMode
+                    ? setNewPassword(e.target.value)
+                    : setPassword(e.target.value)}
                   required
                 />
               </div>
@@ -161,8 +187,16 @@ const Login = () => {
                 <input type="checkbox" className="w-4 h-4 text-teal-600 border-slate-300 rounded focus:ring-teal-500" />
                 <span className="ml-2 text-slate-600">Remember me</span>
               </label>
-              <button type="button" className="text-teal-600 hover:text-teal-700 font-medium transition">
-                Forgot password?
+              <button
+                type="button"
+                onClick={() => {
+                  setIsForgotMode(!isForgotMode);
+                  setError("");
+                  setSuccess("");
+                }}
+                className="text-teal-600 hover:text-teal-700 font-medium"
+              >
+                {isForgotMode ? "Back to login" : "Forgot password?"}
               </button>
             </div>
 
@@ -190,6 +224,7 @@ const Login = () => {
             </button>
           </form>
 
+          {!isForgotMode && (
           <div className="mt-8 text-center">
             <p className="text-slate-600">
               Don't have an account?{" "}
@@ -201,6 +236,7 @@ const Login = () => {
               </Link>
             </p>
           </div>
+          )}
         </div>
       </div>
 
