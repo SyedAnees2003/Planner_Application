@@ -18,67 +18,88 @@ const createIndividualTask = async (req, res) => {
   res.status(201).json(task);
 };
 
-const updateIndividualTask = async (req, res) => {
-  try {
-    const { taskId } = req.params;
-    const { title, description, priority, dueDate, assignedUserId } = req.body;
-    
-    const task = await Task.findByPk(taskId);
-    
-    if (!task || task.assignmentType !== "INDIVIDUAL") {
-      return res.status(404).json({ message: "Individual task not found" });
-    }
-    
-    if (task.createdBy !== req.user.id) {
-      return res.status(403).json({ 
-        message: "You can only edit tasks you created" 
+  const updateIndividualTask = async (req, res) => {
+    try {
+      const { taskId } = req.params;
+      const { title, description, priority, dueDate, assignedUserId, status } = req.body; // ✅ Added status
+      
+      const task = await Task.findByPk(taskId);
+      
+      if (!task || task.assignmentType !== "INDIVIDUAL") {
+        return res.status(404).json({ message: "Individual task not found" });
+      }
+      
+      // Check if user is creator OR assigned user (for status updates)
+      const isCreator = task.createdBy === req.user.id;
+      const isAssignedUser = task.assignedUserId === req.user.id;
+      
+      if (!isCreator && !isAssignedUser) {
+        return res.status(403).json({ 
+          message: "You don't have permission to update this task" 
+        });
+      }
+      
+      // If not creator, only allow status updates
+      if (!isCreator && isAssignedUser) {
+        if (status === undefined) {
+          return res.status(403).json({ 
+            message: "Assigned users can only update task status" 
+          });
+        }
+        
+        // Only update status for assigned users
+        task.status = status;
+        await task.save();
+        
+        return res.json(task);
+      }
+      
+      // ✅ Creator can update everything including status
+      const updatedTask = await task.update({
+        title: title !== undefined ? title : task.title,
+        description: description !== undefined ? description : task.description,
+        priority: priority || task.priority,
+        dueDate: dueDate !== undefined ? dueDate : task.dueDate,
+        assignedUserId: assignedUserId || task.assignedUserId,
+        status: status || task.status, // ✅ Include status update
+        updatedAt: new Date()
+      });
+      
+      // ✅ Return the complete task object directly
+      res.json(updatedTask);
+      
+    } catch (error) {
+      console.error('Error updating individual task:', error);
+      res.status(500).json({ 
+        message: 'Failed to update task',
+        error: error.message 
       });
     }
-    
-    const updatedTask = await task.update({
-      title: title !== undefined ? title : task.title,
-      description: description !== undefined ? description : task.description,
-      priority: priority || task.priority,
-      dueDate: dueDate !== undefined ? dueDate : task.dueDate,
-      assignedUserId: assignedUserId || task.assignedUserId,
-      updatedAt: new Date()
-    });
-    
-    // ✅ IMPORTANT: Return the complete task object
-    res.json(updatedTask); // Don't wrap in extra object
-    
-  } catch (error) {
-    console.error('Error updating individual task:', error);
-    res.status(500).json({ 
-      message: 'Failed to update task',
-      error: error.message 
-    });
-  }
-};
+  };
 
-const updateIndividualTaskStatus = async (req, res) => {
-  const { taskId } = req.params;
-  const { status } = req.body;
+  // You can keep this for backward compatibility, but it's optional now
+  const updateIndividualTaskStatus = async (req, res) => {
+    const { taskId } = req.params;
+    const { status } = req.body;
 
-  const task = await Task.findByPk(taskId);
+    const task = await Task.findByPk(taskId);
 
-  if (!task || task.assignmentType !== "INDIVIDUAL") {
-    return res.status(404).json({ message: "Task not found" });
-  }
+    if (!task || task.assignmentType !== "INDIVIDUAL") {
+      return res.status(404).json({ message: "Task not found" });
+    }
 
-  if (task.createdBy !== req.user.id && task.assignedUserId !== req.user.id) {
-    return res.status(403).json({ 
-      message: "Only task creator or assigned user can update status" 
-    });
-  }
+    // Allow both creator AND assigned user to update status
+    if (task.createdBy !== req.user.id && task.assignedUserId !== req.user.id) {
+      return res.status(403).json({ 
+        message: "Only task creator or assigned user can update status" 
+      });
+    }
 
-  task.status = status;
-  await task.save();
+    task.status = status;
+    await task.save();
 
-  // ✅ Return the complete task object
-  res.json(task);
-};
-
+    res.json(task);
+  };
 /* ---------------- GROUP TASKS ---------------- */
 
 const createGroupTask = async (req, res) => {

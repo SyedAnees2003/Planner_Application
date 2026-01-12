@@ -25,24 +25,28 @@ const IndividualTaskCard = ({ task, readOnly = false }) => {
   const canEdit = isCreator;
   const canMarkComplete = isAssignedToMe && task.status !== "COMPLETED";
   
+  const handleStatusUpdate = async (newStatus) => {
+    if (newStatus === task.status) return;
+  
+    try {
+      // ✅ Now uses PUT with status field
+      await updateIndividualTask(task.id, { status: newStatus });
+      console.log("✅ Status updated successfully");
+    } catch (error) {
+      console.error("❌ Failed to update task status:", error);
+    }
+  };
+  
   const handleSave = async () => {
+    // ✅ Can update all fields at once
     await updateIndividualTask(task.id, {
       title,
       priority,
       dueDate: dueDate || null
     });
+    await loadMyTasks();
     setIsEditing(false);
   };
-
-const handleStatusUpdate = async (newStatus) => {
-  if (newStatus === task.status) return;
-
-  try {
-    await updateIndividualTaskStatus(task.id, newStatus);
-  } catch (error) {
-    console.error("Failed to update task status:", error);
-  }
-};
 
 
   const getAvailableStatuses = () => {

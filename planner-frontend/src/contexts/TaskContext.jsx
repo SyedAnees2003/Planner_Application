@@ -13,7 +13,6 @@ export const TaskProvider = ({ children }) => {
   const [users, setUsers] = useState([]);
   const [taskParticipants, setTaskParticipants] = useState({});
   
-  // Load all users for assignment
   const loadUsers = async () => {
     try {
       const res = await api.get("/users");
@@ -25,7 +24,6 @@ export const TaskProvider = ({ children }) => {
     }
   };
 
-  // Load all groups for mapping
   const loadGroups = async () => {
     try {
       const res = await api.get("/groups");
@@ -140,88 +138,50 @@ export const TaskProvider = ({ children }) => {
     await loadMyTasks();
   };
   
-  // ✅ FIXED: Update individual task status with proper state sync
-  const updateIndividualTaskStatus = async (taskId, status) => {
-    console.log("🔄 Updating task status:", { taskId, status });
-  
-    try {
-      const res = await api.patch(`/tasks/individual/${taskId}/status`, { status });
-      console.log("✅ Status update response:", res.data);
-      
-      const updatedTask = res.data;
-  
-      // Update all three state arrays to ensure consistency
-      setIndividualTasks(prev => {
-        const updated = prev.map(task =>
-          task.id === taskId ? { ...task, ...updatedTask } : task
-        );
-        console.log("📝 Updated individualTasks:", updated);
-        return updated;
-      });
-  
-      setCreatedTasks(prev => {
-        const updated = prev.map(task =>
-          task.id === taskId ? { ...task, ...updatedTask } : task
-        );
-        console.log("📝 Updated createdTasks:", updated);
-        return updated;
-      });
-  
-      // Also update groupTasks in case this task appears there
-      setGroupTasks(prev =>
-        prev.map(item =>
-          item.task && item.task.id === taskId
-            ? { ...item, task: { ...item.task, ...updatedTask } }
-            : item
-        )
-      );
-  
-      return updatedTask;
-    } catch (error) {
-      console.error("❌ Failed to update task status:", error);
-      throw error;
-    }
-  };
-  
-  // ✅ FIXED: Update individual task with proper state sync
+  // ✅ UNIFIED: Update individual task (including status)
   const updateIndividualTask = async (taskId, updatedData) => {
     try {
       console.log("🔄 Updating individual task:", { taskId, updatedData });
       
+      // Send ALL fields including status if provided
       const res = await api.put(`/tasks/individual/${taskId}`, updatedData);
       console.log("✅ Update response:", res.data);
       
-      // Handle different response structures
-      const updatedTask = res.data.task || res.data;
+      // Get the updated task from response
+      const updatedTask = res.data;
       
-      // Ensure we have the complete updated task
+      // Validate response
       if (!updatedTask || !updatedTask.id) {
         console.error("❌ Invalid response from server:", res.data);
-        throw new Error("Invalid response from server");
+        // Reload tasks as fallback
+        await loadMyTasks();
+        await loadCreatedTasks();
+        return;
       }
 
-      // Update all state arrays
+      // Update individualTasks state
       setIndividualTasks(prev => {
         const updated = prev.map(task =>
-          task.id === taskId ? { ...task, ...updatedTask } : task
+          task.id === taskId ? updatedTask : task
         );
         console.log("📝 Updated individualTasks:", updated);
         return updated;
       });
 
+      // Update createdTasks state
       setCreatedTasks(prev => {
         const updated = prev.map(task =>
-          task.id === taskId ? { ...task, ...updatedTask } : task
+          task.id === taskId ? updatedTask : task
         );
         console.log("📝 Updated createdTasks:", updated);
         return updated;
       });
 
-      // Also update groupTasks if needed
+      // Update groupTasks state (in case task appears there)
       setGroupTasks(prev =>
         prev.map(item =>
           item.task && item.task.id === taskId
-            ? { ...item, task: { ...item.task, ...updatedTask } }
+            ? { ...item, task: updatedTask }
             : item
         )
       );
@@ -231,6 +191,14 @@ export const TaskProvider = ({ children }) => {
       console.error("❌ Failed to update individual task:", error);
       throw error;
     }
+  };
+
+  // ✅ Status update now uses the unified updateIndividualTask
+  const updateIndividualTaskStatus = async (taskId, status) => {
+    console.log("🔄 Updating task status via unified endpoint:", { taskId, status });
+    
+    // Just call updateIndividualTask with only status field
+    return await updateIndividualTask(taskId, { status });
   };
 
   const updateTask = async (taskId, data) => {
@@ -267,7 +235,6 @@ export const TaskProvider = ({ children }) => {
         return newTasks;
       });
       
-      // Also update groupTasks
       setGroupTasks(prev =>
         prev.map(item =>
           item.task && item.task.id === taskId
