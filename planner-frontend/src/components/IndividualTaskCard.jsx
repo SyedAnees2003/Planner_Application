@@ -21,7 +21,7 @@ const IndividualTaskCard = ({ task, readOnly = false }) => {
 
   const currentUserId = Number(localStorage.getItem('userId'));
   const isCreator = task.createdBy === currentUserId;
-  const isAssignedToMe = task.assignedUserId === currentUserId;
+  const isAssignedToMe = !readOnly;
   const canEdit = isCreator;
   const canMarkComplete = isAssignedToMe && task.status !== "COMPLETED";
   
@@ -231,30 +231,30 @@ const IndividualTaskCard = ({ task, readOnly = false }) => {
 
             {/* STATUS UPDATE — ASSIGNED USER ONLY */}
             {isAssignedToMe && !readOnly && task.status !== "COMPLETED" && (
-              <div className="mt-4">
-                <label className="block text-sm font-semibold text-slate-600 mb-2">
-                  Update Status
-                </label>
+            <div className="mt-4">
+              <label className="block text-sm font-semibold text-slate-600 mb-2">
+                Update Status
+              </label>
 
-                <select
-                  value={task.status}
-                  onChange={(e) => handleStatusUpdate(e.target.value)}
-                  className="w-full border border-slate-300 rounded-xl px-4 py-2.5 text-sm
-                            focus:outline-none focus:ring-2 focus:ring-teal-500
-                            bg-white"
-                >
-                  <option value={task.status} disabled>
-                    {task.status.replace("_", " ")}
+              <select
+                value={task.status}
+                onChange={(e) => handleStatusUpdate(e.target.value)}
+                className="w-full border border-slate-300 rounded-xl px-4 py-2.5 text-sm
+                          focus:outline-none focus:ring-2 focus:ring-teal-500
+                          bg-white"
+              >
+                <option value={task.status} disabled>
+                  {task.status.replace("_", " ")}
+                </option>
+
+                {getNextStatusOptions(task.status).map((status) => (
+                  <option key={status} value={status}>
+                    {status.replace("_", " ")}
                   </option>
-
-                  {getNextStatusOptions(task.status).map((status) => (
-                    <option key={status} value={status}>
-                      {status.replace("_", " ")}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
+                ))}
+              </select>
+            </div>
+          )}
 
 
             {/* Assigned User Info */}
