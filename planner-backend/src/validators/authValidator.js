@@ -25,4 +25,15 @@ const loginValidator = [
       .withMessage("Password must be at least 6 characters")
   ];
 
-module.exports = { registerValidator, loginValidator };
+  const forgotPasswordValidator = [
+    body("email")
+      .isEmail()
+      .withMessage("Valid email is required"),
+  
+    body("newPassword")
+      .isLength({ min: 6 })
+      .withMessage("Password must be at least 6 characters")
+  ];
+  
+
+module.exports = { registerValidator, loginValidator, forgotPasswordValidator };

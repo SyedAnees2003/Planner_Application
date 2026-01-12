@@ -43,4 +43,21 @@ const login = async (req, res) => {
   });
 };
 
-module.exports = { register, login };
+const forgotPassword = async (req, res) => {
+  const { email, newPassword } = req.body;
+
+  const user = await User.findOne({ where: { email } });
+
+  if (!user) {
+    return res.status(404).json({ message: "User not found" });
+  }
+
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+  user.password = hashedPassword;
+  await user.save();
+
+  res.json({ message: "Password updated successfully" });
+};
+
+module.exports = { register, login, forgotPassword };
