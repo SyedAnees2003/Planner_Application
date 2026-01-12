@@ -175,6 +175,13 @@ const finalizeTask = async (taskId, groupId) => {
           task.id === taskId ? { ...task, ...updatedTask } : task
         )
       );
+
+          // ✅ ALSO update individualTasks
+    setIndividualTasks(prev =>
+      prev.map(task =>
+        task.id === taskId ? { ...task, ...updatedTask } : task
+      )
+    );
       
       return updatedTask;
     } catch (error) {
