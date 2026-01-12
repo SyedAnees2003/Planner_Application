@@ -31,7 +31,6 @@ const IndividualTaskCard = ({ task, readOnly = false }) => {
       priority,
       dueDate: dueDate || null
     });
-    await loadMyTasks();
     setIsEditing(false);
   };
 

@@ -29,7 +29,6 @@ const updateIndividualTask = async (req, res) => {
       return res.status(404).json({ message: "Individual task not found" });
     }
     
-    // Check if user owns the task
     if (task.createdBy !== req.user.id) {
       return res.status(403).json({ 
         message: "You can only edit tasks you created" 
@@ -45,11 +44,8 @@ const updateIndividualTask = async (req, res) => {
       updatedAt: new Date()
     });
     
-    res.json({
-      success: true,
-      message: "Individual task updated successfully",
-      task: updatedTask
-    });
+    // ✅ IMPORTANT: Return the complete task object
+    res.json(updatedTask); // Don't wrap in extra object
     
   } catch (error) {
     console.error('Error updating individual task:', error);
@@ -58,7 +54,6 @@ const updateIndividualTask = async (req, res) => {
       error: error.message 
     });
   }
-  
 };
 
 const updateIndividualTaskStatus = async (req, res) => {
@@ -71,7 +66,6 @@ const updateIndividualTaskStatus = async (req, res) => {
     return res.status(404).json({ message: "Task not found" });
   }
 
-  // IMPORTANT: Allow both creator AND assigned user to update status
   if (task.createdBy !== req.user.id && task.assignedUserId !== req.user.id) {
     return res.status(403).json({ 
       message: "Only task creator or assigned user can update status" 
@@ -81,6 +75,7 @@ const updateIndividualTaskStatus = async (req, res) => {
   task.status = status;
   await task.save();
 
+  // ✅ Return the complete task object
   res.json(task);
 };
 
