@@ -35,6 +35,51 @@ const IndividualTaskCard = ({ task, readOnly = false }) => {
     setIsEditing(false);
   };
 
+  const handleStatusUpdate = async (newStatus) => {
+    try {
+      await updateIndividualTaskStatus(task.id, newStatus);
+      await loadMyTasks();
+    } catch (error) {
+      console.error("Failed to update task status:", error);
+    }
+  };
+
+  const getAvailableStatuses = () => {
+    const allStatuses = ["PENDING", "IN_PROGRESS", "COMPLETED"];
+    
+    // If task is completed, only allow to keep it as COMPLETED
+    if (task.status === "COMPLETED") {
+      return ["COMPLETED"];
+    }
+    
+    // If task is IN_PROGRESS, allow to go back to PENDING or forward to COMPLETED
+    if (task.status === "IN_PROGRESS") {
+      return ["IN_PROGRESS", "PENDING", "COMPLETED"];
+    }
+    
+    // If task is PENDING, allow to go to IN_PROGRESS or stay PENDING
+    if (task.status === "PENDING") {
+      return ["PENDING", "IN_PROGRESS"];
+    }
+    
+    return [task.status];
+  };
+
+  const getStatusTransitionOptions = () => {
+    const current = task.status;
+    const allStatuses = ["PENDING", "IN_PROGRESS", "COMPLETED"];
+    
+    if (current === "COMPLETED") {
+      return [{ value: "COMPLETED", label: "Completed" }];
+    }
+    
+    return allStatuses.map(status => ({
+      value: status,
+      label: status.replace("_", " "),
+      disabled: false
+    }));
+  };
+
   const priorityStyles = {
     HIGH: 'bg-red-100 text-red-700 border-red-200',
     MEDIUM: 'bg-orange-100 text-orange-700 border-orange-200',
@@ -80,6 +125,12 @@ const IndividualTaskCard = ({ task, readOnly = false }) => {
         {isCreator && !readOnly && (
           <span className="px-4 py-1.5 text-sm font-semibold rounded-full bg-gradient-to-r from-teal-100 to-teal-200 text-teal-700 border border-teal-200">
             Created by you
+          </span>
+        )}
+        
+        {isAssignedToMe && !isCreator && !readOnly && (
+          <span className="px-4 py-1.5 text-sm font-semibold rounded-full bg-gradient-to-r from-blue-100 to-blue-200 text-blue-700 border border-blue-200">
+            Assigned to you
           </span>
         )}
       </div>
@@ -163,6 +214,58 @@ const IndividualTaskCard = ({ task, readOnly = false }) => {
               </div>
             )}
 
+            {/* STATUS UPDATE - ASSIGNED USER CAN UPDATE STATUS */}
+            {isAssignedToMe && !readOnly && (
+              <div className="flex items-center gap-3 pt-2">
+                <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center border border-slate-100">
+                  <svg className="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                  </svg>
+                </div>
+                <div className="flex-1">
+                  <label className="text-sm font-semibold text-slate-600 mb-1 block">
+                    Update Status:
+                  </label>
+                  <div className="flex gap-2">
+                    {getAvailableStatuses().map((status) => (
+                      <button
+                        key={status}
+                        onClick={() => handleStatusUpdate(status)}
+                        disabled={status === task.status}
+                        className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
+                          status === task.status
+                            ? statusStyles[status]
+                            : 'bg-slate-100 text-slate-600 hover:bg-slate-200 border border-slate-200'
+                        }`}
+                      >
+                        {status === "COMPLETED" ? "✓ Complete" : status.replace("_", " ")}
+                      </button>
+                    ))}
+                    
+                    {/* Dropdown for more options */}
+                    {getAvailableStatuses().length < 3 && task.status !== "COMPLETED" && (
+                      <select
+                        value={task.status}
+                        onChange={(e) => handleStatusUpdate(e.target.value)}
+                        className="border border-slate-300 rounded-lg px-4 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-teal-500"
+                      >
+                        <option value={task.status}>
+                          Change to...
+                        </option>
+                        {getStatusTransitionOptions()
+                          .filter(opt => opt.value !== task.status)
+                          .map((option) => (
+                            <option key={option.value} value={option.value}>
+                              {option.label}
+                            </option>
+                          ))}
+                      </select>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Assigned User Info */}
             {task.assignedUserId && task.User && (
               <div className="flex items-center gap-3 text-sm text-slate-700">
@@ -171,7 +274,14 @@ const IndividualTaskCard = ({ task, readOnly = false }) => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                   </svg>
                 </div>
-                <span>Assigned to: {task.User.name || "User"}</span>
+                <div>
+                  <span>Assigned to: <strong>{task.User.name || "User"}</strong></span>
+                  {isAssignedToMe && (
+                    <span className="ml-2 px-2 py-0.5 text-xs bg-blue-100 text-blue-700 rounded-full">
+                      You
+                    </span>
+                  )}
+                </div>
               </div>
             )}
           </div>
@@ -205,9 +315,10 @@ const IndividualTaskCard = ({ task, readOnly = false }) => {
               </button>
             )}
 
-            {canMarkComplete && !readOnly && (
+            {/* Quick Complete Button for assigned users */}
+            {isAssignedToMe && !readOnly && task.status !== "COMPLETED" && (
               <button
-                onClick={() => updateIndividualTaskStatus(task.id, "COMPLETED")}
+                onClick={() => handleStatusUpdate("COMPLETED")}
                 className="flex items-center gap-2 px-4 py-2.5 text-sm bg-gradient-to-r from-teal-600 to-teal-700 text-white rounded-xl hover:from-teal-700 hover:to-teal-800 font-semibold transition-all duration-200 shadow-lg shadow-teal-500/30"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -239,12 +350,21 @@ const IndividualTaskCard = ({ task, readOnly = false }) => {
             </div>
           )}
 
-          {isAssignedToMe && !isCreator && task.status !== 'COMPLETED' && !readOnly && (
+          {/* Info Box */}
+          {isAssignedToMe && !isCreator && !readOnly && (
             <div className="mt-5 p-4 bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 rounded-xl text-sm text-blue-700 flex items-start gap-3">
               <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd"/>
               </svg>
-              <span>You can mark this task as complete, but only the creator can edit its details.</span>
+              <div>
+                <p className="font-semibold mb-1">Assigned User Permissions:</p>
+                <ul className="list-disc pl-4 space-y-1">
+                  <li>You can update the task status (Pending → In Progress → Complete)</li>
+                  <li>You can mark the task as complete with one click</li>
+                  <li>You can add comments to the task</li>
+                  <li>Only the task creator can edit task details (title, priority, due date)</li>
+                </ul>
+              </div>
             </div>
           )}
         </>
