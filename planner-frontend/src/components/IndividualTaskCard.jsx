@@ -25,6 +25,16 @@ const IndividualTaskCard = ({ task, readOnly = false }) => {
   const canEdit = isCreator;
   const canMarkComplete = isAssignedToMe && task.status !== "COMPLETED";
   
+  const getNextStatusOptions = (currentStatus) => {
+    if (currentStatus === "PENDING") {
+      return ["IN_PROGRESS"];
+    }
+    if (currentStatus === "IN_PROGRESS") {
+      return ["COMPLETED"];
+    }
+    return [];
+  };
+  
   const handleStatusUpdate = async (newStatus) => {
     if (newStatus === task.status) return;
   
@@ -219,57 +229,33 @@ const IndividualTaskCard = ({ task, readOnly = false }) => {
               </div>
             )}
 
-            {/* STATUS UPDATE - ASSIGNED USER CAN UPDATE STATUS */}
-            {isAssignedToMe && !readOnly && (
-              <div className="flex items-center gap-3 pt-2">
-                <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center border border-slate-100">
-                  <svg className="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                  </svg>
-                </div>
-                <div className="flex-1">
-                  <label className="text-sm font-semibold text-slate-600 mb-1 block">
-                    Update Status:
-                  </label>
-                  <div className="flex gap-2">
-                    {getAvailableStatuses().map((status) => (
-                      <button
-                        key={status}
-                        onClick={() => handleStatusUpdate(status)}
-                        disabled={status === task.status}
-                        className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
-                          status === task.status
-                            ? statusStyles[status]
-                            : 'bg-slate-100 text-slate-600 hover:bg-slate-200 border border-slate-200'
-                        }`}
-                      >
-                        {status === "COMPLETED" ? "✓ Complete" : status.replace("_", " ")}
-                      </button>
-                    ))}
-                    
-                    {/* Dropdown for more options */}
-                    {getAvailableStatuses().length < 3 && task.status !== "COMPLETED" && (
-                      <select
-                        value={task.status}
-                        onChange={(e) => handleStatusUpdate(e.target.value)}
-                        className="border border-slate-300 rounded-lg px-4 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-teal-500"
-                      >
-                        <option value={task.status}>
-                          Change to...
-                        </option>
-                        {getStatusTransitionOptions()
-                          .filter(opt => opt.value !== task.status)
-                          .map((option) => (
-                            <option key={option.value} value={option.value}>
-                              {option.label}
-                            </option>
-                          ))}
-                      </select>
-                    )}
-                  </div>
-                </div>
+            {/* STATUS UPDATE — ASSIGNED USER ONLY */}
+            {isAssignedToMe && !readOnly && task.status !== "COMPLETED" && (
+              <div className="mt-4">
+                <label className="block text-sm font-semibold text-slate-600 mb-2">
+                  Update Status
+                </label>
+
+                <select
+                  value={task.status}
+                  onChange={(e) => handleStatusUpdate(e.target.value)}
+                  className="w-full border border-slate-300 rounded-xl px-4 py-2.5 text-sm
+                            focus:outline-none focus:ring-2 focus:ring-teal-500
+                            bg-white"
+                >
+                  <option value={task.status} disabled>
+                    {task.status.replace("_", " ")}
+                  </option>
+
+                  {getNextStatusOptions(task.status).map((status) => (
+                    <option key={status} value={status}>
+                      {status.replace("_", " ")}
+                    </option>
+                  ))}
+                </select>
               </div>
             )}
+
 
             {/* Assigned User Info */}
             {task.assignedUserId && task.User && (
