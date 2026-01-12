@@ -12,7 +12,7 @@ const GroupComments = ({ groupId, isOpen, onClose }) => {
     if (hostname === 'localhost' || hostname === '127.0.0.1') {
       return 'http://localhost:5000';
     }
-    return '';
+    return 'https://planner-application-2kgd.onrender.com';
   };
 
   const fetchComments = async () => {
