@@ -155,9 +155,33 @@ const finalizeTask = async (taskId, groupId) => {
   };
   
   const updateIndividualTaskStatus = async (taskId, status) => {
-    await api.patch(`/tasks/individual/${taskId}/status`, { status });
-    await loadMyTasks();
+    console.log("PATCH STATUS API CALLED:", taskId, status);
+  
+    const res = await api.patch(
+      `/tasks/individual/${taskId}/status`,
+      { status }
+    );
+  
+    console.log("PATCH RESPONSE:", res.data);
+  
+    const updatedTask = res.data;
+  
+    // ✅ Single source of truth update
+    setIndividualTasks(prev =>
+      prev.map(task =>
+        task.id === taskId ? updatedTask : task
+      )
+    );
+  
+    setCreatedTasks(prev =>
+      prev.map(task =>
+        task.id === taskId ? updatedTask : task
+      )
+    );
+  
+    return updatedTask;
   };
+  
   
   const updateIndividualTask = async (taskId, updatedData) => {
     try {

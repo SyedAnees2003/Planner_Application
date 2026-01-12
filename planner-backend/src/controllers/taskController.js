@@ -209,7 +209,8 @@ const getMyTasks = async (req, res) => {
     where: {
       assignmentType: "INDIVIDUAL",
       assignedUserId: req.user.id
-    }
+    },
+    order: [["updatedAt", "DESC"]]
   });
 
   const participations = await TaskParticipation.findAll({
