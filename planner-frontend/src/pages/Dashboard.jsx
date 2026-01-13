@@ -47,7 +47,7 @@ const Dashboard = () => {
       <Sidebar />
 
       <div className="flex-1 ml-64">
-        <div className="max-w-7xl mx-auto px-6 py-10 space-y-10">
+        <div className="max-w-6xl mx-auto px-6 py-10 space-y-10">
         
           {/* HEADER */}
           <div className="bg-gradient-to-r from-teal-600 via-teal-600 to-cyan-600 rounded-3xl p-8 text-white shadow-xl border border-teal-500/20">
