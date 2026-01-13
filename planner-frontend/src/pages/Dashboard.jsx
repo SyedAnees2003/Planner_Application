@@ -47,14 +47,14 @@ const Dashboard = () => {
       <Sidebar />
 
       <div className="flex-1 ml-64">
-        <div className="max-w-6xl mx-auto px-6 py-10 space-y-10">
+        <div className="max-w-7xl mx-auto px-6 py-10 space-y-10">
         
           {/* HEADER */}
-          <div className="bg-gradient-to-r from-teal-600 via-teal-600 to-cyan-600 rounded-3xl p-10 text-white shadow-xl border border-teal-500/20">
-            <h1 className="text-4xl font-bold mb-3 tracking-tight">
+          <div className="bg-gradient-to-r from-teal-600 via-teal-600 to-cyan-600 rounded-3xl p-8 text-white shadow-xl border border-teal-500/20">
+            <h1 className="text-3xl font-bold mb-2 tracking-tight">
               Hello, {user?.name} 👋
             </h1>
-            <p className="text-teal-50 text-xl font-light">
+            <p className="text-teal-50 text-lg font-light">
               Let's get things done 🚀
             </p>
           </div>
@@ -76,23 +76,23 @@ const Dashboard = () => {
           {/* INDIVIDUAL TASKS OVERVIEW */}
           <section className="space-y-6">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="w-1.5 h-10 bg-gradient-to-b from-teal-500 to-teal-600 rounded-full shadow-md"></div>
+              <div className="flex items-center gap-3">
+                <div className="w-1 h-8 bg-gradient-to-b from-teal-500 to-teal-600 rounded-full shadow-md"></div>
                 <div>
-                  <h2 className="text-2xl font-bold text-slate-800 tracking-tight">
+                  <h2 className="text-xl font-bold text-slate-800 tracking-tight">
                     My Individual Tasks
                   </h2>
-                  <p className="text-sm text-slate-500 mt-0.5">
+                  <p className="text-xs text-slate-500 mt-0.5">
                     Track and manage your personal tasks
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => navigate("/my-tasks")}
-                className="flex items-center gap-2 px-5 py-2.5 bg-teal-50 hover:bg-teal-100 text-teal-700 hover:text-teal-800 font-semibold rounded-xl transition-all duration-200 group shadow-sm hover:shadow-md"
+                className="flex items-center gap-2 px-4 py-2 bg-teal-50 hover:bg-teal-100 text-teal-700 hover:text-teal-800 font-semibold text-sm rounded-xl transition-all duration-200 group shadow-sm hover:shadow-md"
               >
                 <span>View All</span>
-                <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                 </svg>
               </button>
@@ -111,16 +111,16 @@ const Dashboard = () => {
             ) : (
               <div className="space-y-6">
                 {/* Progress Card */}
-                <div className="bg-white rounded-2xl p-8 shadow-lg border border-slate-200 hover:shadow-xl transition-shadow duration-300">
-                  <div className="flex items-center justify-between mb-6">
+                <div className="bg-white rounded-2xl p-6 shadow-lg border border-slate-200 hover:shadow-xl transition-shadow duration-300">
+                  <div className="flex items-center justify-between mb-5">
                     <div className="space-y-1">
-                      <h3 className="text-xl font-bold text-slate-800">Overall Progress</h3>
-                      <p className="text-sm text-slate-600">
+                      <h3 className="text-lg font-bold text-slate-800">Overall Progress</h3>
+                      <p className="text-xs text-slate-600">
                         {completedIndividual} of {individualTasks.length} tasks completed
                       </p>
                     </div>
                     <div className="text-right">
-                      <div className="text-4xl font-bold text-teal-600">{individualProgress}%</div>
+                      <div className="text-3xl font-bold text-teal-600">{individualProgress}%</div>
                       <p className="text-xs text-slate-500 mt-1">Complete</p>
                     </div>
                   </div>
@@ -154,7 +154,7 @@ const Dashboard = () => {
 
                 {/* Recent Tasks */}
                 <div className="space-y-3">
-                  <h3 className="text-lg font-semibold text-slate-700 px-1">Recent Tasks</h3>
+                  <h3 className="text-base font-semibold text-slate-700 px-1">Recent Tasks</h3>
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     {individualTasks.slice(0, 4).map(task => (
                       <TaskCard key={task.id} task={task} />
@@ -171,23 +171,23 @@ const Dashboard = () => {
           {/* GROUP TASKS OVERVIEW */}
           <section className="space-y-6">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="w-1.5 h-10 bg-gradient-to-b from-purple-500 to-purple-600 rounded-full shadow-md"></div>
+              <div className="flex items-center gap-3">
+                <div className="w-1 h-8 bg-gradient-to-b from-purple-500 to-purple-600 rounded-full shadow-md"></div>
                 <div>
-                  <h2 className="text-2xl font-bold text-slate-800 tracking-tight">
+                  <h2 className="text-xl font-bold text-slate-800 tracking-tight">
                     My Group Tasks
                   </h2>
-                  <p className="text-sm text-slate-500 mt-0.5">
+                  <p className="text-xs text-slate-500 mt-0.5">
                     Collaborate with your team
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => navigate("/my-tasks")}
-                className="flex items-center gap-2 px-5 py-2.5 bg-purple-50 hover:bg-purple-100 text-purple-700 hover:text-purple-800 font-semibold rounded-xl transition-all duration-200 group shadow-sm hover:shadow-md"
+                className="flex items-center gap-2 px-4 py-2 bg-purple-50 hover:bg-purple-100 text-purple-700 hover:text-purple-800 font-semibold text-sm rounded-xl transition-all duration-200 group shadow-sm hover:shadow-md"
               >
                 <span>View All</span>
-                <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                 </svg>
               </button>
@@ -206,16 +206,16 @@ const Dashboard = () => {
             ) : (
               <div className="space-y-6">
                 {/* Progress Card */}
-                <div className="bg-white rounded-2xl p-8 shadow-lg border border-slate-200 hover:shadow-xl transition-shadow duration-300">
-                  <div className="flex items-center justify-between mb-6">
+                <div className="bg-white rounded-2xl p-6 shadow-lg border border-slate-200 hover:shadow-xl transition-shadow duration-300">
+                  <div className="flex items-center justify-between mb-5">
                     <div className="space-y-1">
-                      <h3 className="text-xl font-bold text-slate-800">Participation Progress</h3>
-                      <p className="text-sm text-slate-600">
+                      <h3 className="text-lg font-bold text-slate-800">Participation Progress</h3>
+                      <p className="text-xs text-slate-600">
                         {completedGroup} of {groupTasks.length} participations completed
                       </p>
                     </div>
                     <div className="text-right">
-                      <div className="text-4xl font-bold text-purple-600">{groupProgress}%</div>
+                      <div className="text-3xl font-bold text-purple-600">{groupProgress}%</div>
                       <p className="text-xs text-slate-500 mt-1">Complete</p>
                     </div>
                   </div>
@@ -249,7 +249,7 @@ const Dashboard = () => {
 
                 {/* Recent Group Tasks */}
                 <div className="space-y-3">
-                  <h3 className="text-lg font-semibold text-slate-700 px-1">Recent Group Tasks</h3>
+                  <h3 className="text-base font-semibold text-slate-700 px-1">Recent Group Tasks</h3>
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     {groupTasks.slice(0, 4).map(({ task, participationCompleted }) => (
                       <GroupTaskCard
@@ -270,23 +270,23 @@ const Dashboard = () => {
           {/* GROUPS */}
           <section className="space-y-6 pb-10">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="w-1.5 h-10 bg-gradient-to-b from-blue-500 to-blue-600 rounded-full shadow-md"></div>
+              <div className="flex items-center gap-3">
+                <div className="w-1 h-8 bg-gradient-to-b from-blue-500 to-blue-600 rounded-full shadow-md"></div>
                 <div>
-                  <h2 className="text-2xl font-bold text-slate-800 tracking-tight">
+                  <h2 className="text-xl font-bold text-slate-800 tracking-tight">
                     My Groups
                   </h2>
-                  <p className="text-sm text-slate-500 mt-0.5">
+                  <p className="text-xs text-slate-500 mt-0.5">
                     Your collaborative workspaces
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => navigate("/groups")}
-                className="flex items-center gap-2 px-5 py-2.5 bg-blue-50 hover:bg-blue-100 text-blue-700 hover:text-blue-800 font-semibold rounded-xl transition-all duration-200 group shadow-sm hover:shadow-md"
+                className="flex items-center gap-2 px-4 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 hover:text-blue-800 font-semibold text-sm rounded-xl transition-all duration-200 group shadow-sm hover:shadow-md"
               >
                 <span>View All</span>
-                <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                 </svg>
               </button>
